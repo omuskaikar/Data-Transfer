@@ -1,0 +1,13 @@
+# Python ignores
+venv/
+__pycache__/
+*.py[cod]
+*.env
+
+# Node.js ignores (frontend)
+node_modules/
+build/
+
+# Django/Flask ignores
+*.log
+*.sqlite3
