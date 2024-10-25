@@ -41,9 +41,19 @@ const UploadDatabases = () => {
   const [selectedMssqlTable, setSelectedMssqlTable] = useState("");
   const [selectedPostgresTable, setSelectedPostgresTable] = useState("");
 
-  const [mssqlConnString, setMssqlConnString] = useState(""); // Store MSSQL connection string
-  const [postgresConnString, setPostgresConnString] = useState(""); // Store PostgreSQL connection string
-  const [acno, setAcno] = useState(""); // Store acno input
+  const [mssqlConnString, setMssqlConnString] = useState("");
+  const [postgresConnString, setPostgresConnString] = useState("");
+  const [acno, setAcno] = useState("");
+  const [mssqlTableSearch, setMssqlTableSearch] = useState("");
+  const [postgresTableSearch, setPostgresTableSearch] = useState("");
+
+  // Filter tables based on search term
+  const filteredMssqlTables = mssqlTables.filter((table) =>
+    table.toLowerCase().includes(mssqlTableSearch.toLowerCase())
+  );
+  const filteredPostgresTables = postgresTables.filter((table) =>
+    table.toLowerCase().includes(postgresTableSearch.toLowerCase())
+  );
 
   // Handle MSSQL connection and fetch databases
   const handleMssqlConnect = async () => {
@@ -57,7 +67,7 @@ const UploadDatabases = () => {
         setMssqlConnected(true);
         setMssqlConnString(
           `MSSQL Connection: ${mssqlDetails.user}@${mssqlDetails.host}`
-        ); // Set MSSQL connection string
+        );
         toast.success("Connected to MSSQL successfully!");
       } else {
         toast.error("Failed to connect to MSSQL");
@@ -80,7 +90,7 @@ const UploadDatabases = () => {
         setPostgresConnected(true);
         setPostgresConnString(
           `PostgreSQL Connection: ${postgresDetails.user}@${postgresDetails.host}`
-        ); // Set PostgreSQL connection string
+        );
         toast.success("Connected to PostgreSQL successfully!");
       } else {
         toast.error("Failed to connect to PostgreSQL");
@@ -146,7 +156,7 @@ const UploadDatabases = () => {
           mssql_password: mssqlDetails.password,
           mssql_dbname: selectedMssqlDb,
           mssql_table: selectedMssqlTable,
-          acno, // Pass acno input
+          acno,
         }
       );
       if (response.data.status === "success") {
@@ -176,7 +186,7 @@ const UploadDatabases = () => {
         container
         spacing={4}
         sx={{
-          maxWidth: "1200px", // Limit the width of the content area
+          maxWidth: "1200px",
         }}
       >
         {/* MSSQL Section */}
@@ -197,7 +207,7 @@ const UploadDatabases = () => {
                     fontWeight: "bold",
                     color: "#d359ff",
                     textAlign: "center",
-                    marginBottom: 3, // Add spacing below the title
+                    marginBottom: 3,
                   }}
                 >
                   MSSQL Connection
@@ -221,7 +231,6 @@ const UploadDatabases = () => {
                   >
                     MSSQL - Select Database
                   </Typography>
-                  {/* MSSQL Connection String */}
                   <Typography
                     variant="body2"
                     sx={{
@@ -265,15 +274,40 @@ const UploadDatabases = () => {
                     </Typography>
                     <Select
                       fullWidth
+                      displayEmpty
                       value={selectedMssqlTable}
                       onChange={(e) => setSelectedMssqlTable(e.target.value)}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 300,
+                          },
+                        },
+                      }}
                       sx={{
                         marginTop: 2,
                         backgroundColor: "#3c4047",
                         color: "white",
                       }}
+                      renderValue={(selected) => selected || "Search tables..."}
                     >
-                      {mssqlTables.map((table, index) => (
+                      <MenuItem disabled>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          placeholder="Search tables..."
+                          value={mssqlTableSearch}
+                          onChange={(e) => setMssqlTableSearch(e.target.value)}
+                          sx={{
+                            backgroundColor: "#3c4047",
+                            "& .MuiInputBase-input": { color: "white" },
+                          }}
+                          InputLabelProps={{
+                            style: { color: "#d359ff" },
+                          }}
+                        />
+                      </MenuItem>
+                      {filteredMssqlTables.map((table, index) => (
                         <MenuItem key={index} value={table}>
                           {table}
                         </MenuItem>
@@ -304,7 +338,7 @@ const UploadDatabases = () => {
                     fontWeight: "bold",
                     color: "#d359ff",
                     textAlign: "center",
-                    marginBottom: 3, // Add spacing below the title
+                    marginBottom: 3,
                   }}
                 >
                   PostgreSQL Connection
@@ -328,7 +362,6 @@ const UploadDatabases = () => {
                   >
                     PostgreSQL - Select Database
                   </Typography>
-                  {/* PostgreSQL Connection String */}
                   <Typography
                     variant="body2"
                     sx={{
@@ -372,15 +405,42 @@ const UploadDatabases = () => {
                     </Typography>
                     <Select
                       fullWidth
+                      displayEmpty
                       value={selectedPostgresTable}
                       onChange={(e) => setSelectedPostgresTable(e.target.value)}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 300,
+                          },
+                        },
+                      }}
                       sx={{
                         marginTop: 2,
                         backgroundColor: "#3c4047",
                         color: "white",
                       }}
+                      renderValue={(selected) => selected || "Search tables..."}
                     >
-                      {postgresTables.map((table, index) => (
+                      <MenuItem disabled>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          placeholder="Search tables..."
+                          value={postgresTableSearch}
+                          onChange={(e) =>
+                            setPostgresTableSearch(e.target.value)
+                          }
+                          sx={{
+                            backgroundColor: "#3c4047",
+                            "& .MuiInputBase-input": { color: "white" },
+                          }}
+                          InputLabelProps={{
+                            style: { color: "#d359ff" },
+                          }}
+                        />
+                      </MenuItem>
+                      {filteredPostgresTables.map((table, index) => (
                         <MenuItem key={index} value={table}>
                           {table}
                         </MenuItem>
