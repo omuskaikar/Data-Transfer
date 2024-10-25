@@ -132,43 +132,46 @@ const UploadDatabases = () => {
       toast.error("Error fetching PostgreSQL tables.");
     }
   };
+const handleTransfer = async () => {
+  if (!selectedMssqlTable || !selectedPostgresTable || !acno) {
+    toast.error(
+      "Please select both MSSQL and PostgreSQL tables and provide an ACNO to transfer data."
+    );
+    return;
+  }
 
-  // Handle Transfer button click - Call the PostgresToMssql API
-  const handleTransfer = async () => {
-    if (!selectedMssqlTable || !selectedPostgresTable || !acno) {
-      toast.error(
-        "Please select both MSSQL and PostgreSQL tables and provide an ACNO to transfer data."
-      );
-      return;
-    }
+  try {
+    // Determine the API endpoint based on the selected MSSQL table
+    const endpoint =
+      selectedMssqlTable === "mh_voters_ac"
+        ? "http://localhost:8000/dbmanager/mh_voters_ac/"
+        : "http://localhost:8000/dbmanager/mssql-to-postgres/";
 
-    try {
-      const response = await axios.post(
-        "http://localhost:8000/dbmanager/mssql-to-postgres/",
-        {
-          postgres_host: postgresDetails.host,
-          postgres_user: postgresDetails.user,
-          postgres_password: postgresDetails.password,
-          postgres_dbname: selectedPostgresDb,
-          postgres_table: selectedPostgresTable,
-          mssql_host: mssqlDetails.host,
-          mssql_user: mssqlDetails.user,
-          mssql_password: mssqlDetails.password,
-          mssql_dbname: selectedMssqlDb,
-          mssql_table: selectedMssqlTable,
-          acno,
-        }
-      );
-      if (response.data.status === "success") {
-        toast.success("Data transferred successfully!");
-      } else {
-        toast.error("Data transfer failed: " + response.data.message);
-      }
-    } catch (error) {
-      console.error("Error transferring data:", error);
-      toast.error("Error transferring data.");
+    const response = await axios.post(endpoint, {
+      postgres_host: postgresDetails.host,
+      postgres_user: postgresDetails.user,
+      postgres_password: postgresDetails.password,
+      postgres_dbname: selectedPostgresDb,
+      postgres_table: selectedPostgresTable,
+      mssql_host: mssqlDetails.host,
+      mssql_user: mssqlDetails.user,
+      mssql_password: mssqlDetails.password,
+      mssql_dbname: selectedMssqlDb,
+      mssql_table: selectedMssqlTable,
+      acno,
+    });
+
+    if (response.data.status === "success") {
+      toast.success("Data transferred successfully!");
+    } else {
+      toast.error("Data transfer failed: " + response.data.message);
     }
-  };
+  } catch (error) {
+    console.error("Error transferring data:", error);
+    toast.error("Error transferring data.");
+  }
+};
+
 
   return (
     <Box
