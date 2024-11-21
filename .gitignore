@@ -11,3 +11,6 @@ build/
 # Django/Flask ignores
 *.log
 *.sqlite3
+
+# Local Netlify folder
+.netlify
